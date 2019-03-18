@@ -1,0 +1,41 @@
+# project-root/docker-compose.yml
+
+version: "3"
+services:
+  node:
+    # This binds your container to a virtual network
+    # that can access all containers belonging to it
+    networks:
+      - mynetwork
+    build:
+      context: "./node"
+      dockerfile: Dockerfile
+    # This is the port Nuxt.js exposes. It is exposed
+    # to all containers in the network. You can customize it
+    expose: ["3000"]
+    volumes:
+      - ./node/app:/usr/app
+      - static:/usr/static
+
+  nginx:
+    networks:
+      - mynetwork
+    image: nginx:alpine
+    # This binds your webserver port to the actual
+    # host port. As you can tell, this is for prod
+    # configuration, as you might not want to use
+    # port 80 in your local development env
+    ports:
+      - "9000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static:/usr/share/nginx/html
+
+# Define the network. Not mandatory, but nice to have
+# in order to keep track of what can access what
+networks:
+  mynetwork:
+
+# Define the volumes. We'll get to them later on
+volumes:
+  static: {}
